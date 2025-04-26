@@ -1,6 +1,7 @@
 package com.skillshiring.demo.service;
 
 import com.skillshiring.demo.Repository.UserRepo;
+import com.skillshiring.demo.config.JwtProvider;
 import com.skillshiring.demo.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,16 +62,17 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public User followUser(Integer userId1, Integer userId2) {
-        User user1=findUserById(userId1);
+    public User followUser(Integer reqUserId, Integer userId2) {
+        //req --> other
+        User reqUser=findUserById(reqUserId);
         User user2=findUserById(userId2);
 
-        user2.getFollowers().add(user1.getId());
-        user1.getFollowing().add(user2.getId());
+        user2.getFollowers().add(reqUser.getId());
+        reqUser.getFollowing().add(user2.getId());
 
-        userRepo.save(user1);
+        userRepo.save(reqUser);
         userRepo.save(user2);
-        return user1;
+        return reqUser;
     }
 
     @Override
@@ -141,5 +143,12 @@ public class UserServiceImplement implements UserService {
     public List<User> searchUser(String query) {
 
         return userRepo.searchUser(query);
+    }
+
+    @Override
+    public User findUserByJwtToken(String jwtToken) {
+        String email= JwtProvider.getEmailFromToken(jwtToken);
+        User user=userRepo.findByEmail(email);
+        return user;
     }
 }
