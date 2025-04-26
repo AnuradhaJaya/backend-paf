@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api")
 public class UserController {
 
     @Autowired
@@ -32,17 +33,25 @@ public class UserController {
     }
 
 
-    @PutMapping("/update-user/{userId}")
-    public User updateUser(@RequestBody User user,@PathVariable Integer userId) {
-        User updateuser=userService.updateUser(user,userId);
+    @PutMapping("/update-user")
+    public User updateUser(@RequestHeader("Authorization") String token,@RequestBody User user) {
+        User reqUser=userService.findUserByJwtToken(token);
+        User updateuser=userService.updateUser(user,reqUser.getId());
         return updateuser;
     }
 
-    @PutMapping("/follow-user/{userId1}/{userId2}")
-    public User followUserHandler(@PathVariable Integer userId1,@PathVariable Integer userId2) {
-        User user=userService.followUser(userId1,userId2);
+    @PutMapping("/follow-user/{userId2}")
+    public User followUserHandler(@RequestHeader("Authorization") String token,@PathVariable Integer userId2) {
+        User reqUser = userService.findUserByJwtToken(token);
+        User user=userService.followUser(reqUser.getId(),userId2);
         return user;
     }
+
+//    @PutMapping("/follow-user/{userId1}/{userId2}")
+//    public User followUserHandler(@PathVariable Integer userId1,@PathVariable Integer userId2) {
+//        User user=userService.followUser(userId1,userId2);
+//        return user;
+//    }
 
     @GetMapping("/search-user")
     public List<User> searchUser(@RequestParam ("query") String query) {
@@ -66,5 +75,14 @@ public class UserController {
 
         userRepo.deleteById(userId);
         return "User deleted successfully with id "+userId;
+    }
+
+    @GetMapping("/user/profile")
+    public User getUserWithToken(@RequestHeader("Authorization") String token) {
+//        String email=
+        System.out.println("jwt ---> "+token);
+        User user=userService.findUserByJwtToken(token);
+        user.setPassword(null);
+        return user;
     }
 }
