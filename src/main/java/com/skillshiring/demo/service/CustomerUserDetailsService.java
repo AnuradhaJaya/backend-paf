@@ -31,6 +31,8 @@ public class CustomerUserDetailsService implements UserDetailsService {
         // For now, grant a default role (e.g., ROLE_USER)
         List<GrantedAuthority> authorities = new ArrayList<>();
 
+
+
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }
