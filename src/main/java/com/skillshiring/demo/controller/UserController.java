@@ -19,13 +19,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/user")
-    public User createUser(@RequestBody User user) {
-        User savedUser=userService.registerUser(user);
-        return savedUser;
-    }
-
-
     @GetMapping("/get-alluser")
     public List<User> getAllUser() {
         List<User> users=userRepo.findAll();
